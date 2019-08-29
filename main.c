@@ -61,12 +61,22 @@ uint8_t parity(uint16_t x)
 	return (p & 1) == 0;
 }
 
+void update_ac_inc(Flags *flags, uint16_t prevv, uint16_t newv)
+{
+    flags->ac = (((prevv >> 3) & 1) && (!((newv >> 3) & 1)) && ((newv >> 4) & 1));
+}
+
+void update_ac_dec(Flags *flags, uint16_t prevv, uint16_t newv)
+{
+    flags->ac = (((prevv >> 4) & 1) && (!((newv >> 4) & 1)) && ((newv >> 3) & 1));
+}
+
+
 void update_flags_nc(Flags *flags, uint16_t n)
 {
     flags->z = ((n & 0xFF) == 0);
     flags->s = ((n & 0x80) != 0);
     flags->p = parity(n & 0xFF);
-    flags->ac = 0;
 }
 
 void update_flags(Flags *flags, uint16_t n)
@@ -102,12 +112,18 @@ void inx_b(State8080 *state, uint8_t *opcode)
 
 void inr_b(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, ++state->bc.s.b);
+    uint16_t prevv = state->bc.s.b;
+    uint16_t newv = ++state->bc.s.b;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void dcr_b(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, --state->bc.s.b);
+    uint16_t prevv = state->bc.s.b;
+    uint16_t newv = --state->bc.s.b;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void mvi_b(State8080 *state, uint8_t *opcode)
@@ -140,12 +156,18 @@ void dcx_b(State8080 *state, uint8_t *opcode)
 
 void inr_c(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, ++state->bc.s.c);
+    uint16_t prevv = state->bc.s.c;
+    uint16_t newv = ++state->bc.s.c;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void dcr_c(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, --state->bc.s.c);
+    uint16_t prevv = state->bc.s.c;
+    uint16_t newv = --state->bc.s.c;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void mvi_c(State8080 *state, uint8_t *opcode)
@@ -178,12 +200,18 @@ void inx_d(State8080 *state, uint8_t *opcode)
 
 void inr_d(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, ++state->de.s.d);
+    uint16_t prevv = state->de.s.d;
+    uint16_t newv = ++state->de.s.d;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void dcr_d(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, --state->de.s.d);
+    uint16_t prevv = state->de.s.d;
+    uint16_t newv = --state->de.s.d;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void mvi_d(State8080 *state, uint8_t *opcode)
@@ -216,12 +244,18 @@ void dcx_d(State8080 *state, uint8_t *opcode)
 
 void inr_e(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, ++state->de.s.e);
+    uint16_t prevv = state->de.s.e;
+    uint16_t newv = ++state->de.s.e;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void dcr_e(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, --state->de.s.e);
+    uint16_t prevv = state->de.s.e;
+    uint16_t newv = --state->de.s.e;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void mvi_e(State8080 *state, uint8_t *opcode)
@@ -259,12 +293,18 @@ void inx_h(State8080 *state, uint8_t *opcode)
 
 void inr_h(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, ++state->hl.s.h);
+    uint16_t prevv = state->hl.s.h;
+    uint16_t newv = ++state->hl.s.h;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void dcr_h(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, --state->hl.s.h);
+    uint16_t prevv = state->hl.s.h;
+    uint16_t newv = --state->hl.s.h;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void mvi_h(State8080 *state, uint8_t *opcode)
@@ -297,12 +337,18 @@ void dcx_h(State8080 *state, uint8_t *opcode)
 
 void inr_l(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, ++state->hl.s.l);
+    uint16_t prevv = state->hl.s.l;
+    uint16_t newv = ++state->hl.s.l;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void dcr_l(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, --state->hl.s.l);
+    uint16_t prevv = state->hl.s.l;
+    uint16_t newv = --state->hl.s.l;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void mvi_l(State8080 *state, uint8_t *opcode)
@@ -335,12 +381,18 @@ void inx_sp(State8080 *state, uint8_t *opcode)
 
 void inr_m(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, ++state->memory[state->hl.hl]);
+    uint16_t prevv = state->memory[state->hl.hl];
+    uint16_t newv = ++state->memory[state->hl.hl];
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void dcr_m(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, --state->memory[state->hl.hl]);
+    uint16_t prevv = state->memory[state->hl.hl];
+    uint16_t newv = --state->memory[state->hl.hl];
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void mvi_m(State8080 *state, uint8_t *opcode)
@@ -372,12 +424,18 @@ void dcx_sp(State8080 *state, uint8_t *opcode)
 
 void inr_a(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, ++state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = ++state->af.s.a;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void dcr_a(State8080 *state, uint8_t *opcode)
 {
-    update_flags_nc(&state->af.s.cc, --state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = --state->af.s.a;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags_nc(&state->af.s.cc, newv);
 }
 
 void mvi_a(State8080 *state, uint8_t *opcode)
@@ -713,297 +771,401 @@ void mov_aa(State8080 *state, uint8_t *opcode)
 
 void add_b(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += state->bc.s.b);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += state->bc.s.b;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void add_c(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += state->bc.s.c);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += state->bc.s.c;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void add_d(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += state->de.s.d);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += state->de.s.d;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void add_e(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += state->de.s.e);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += state->de.s.e;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void add_h(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += state->hl.s.h);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += state->hl.s.h;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void add_l(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += state->hl.s.l);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += state->hl.s.l;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void add_m(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += state->memory[state->hl.hl]);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += state->memory[state->hl.hl];
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void add_a(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += state->af.s.a;
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void adc_b(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += state->bc.s.b + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (state->bc.s.b + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void adc_c(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += state->bc.s.c + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (state->bc.s.c + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void adc_d(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += state->de.s.d + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (state->de.s.d + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void adc_e(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += state->de.s.e + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (state->de.s.e + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void adc_h(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += state->hl.s.h + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (state->hl.s.h + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void adc_l(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += state->hl.s.l + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (state->hl.s.l + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void adc_m(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += state->memory[state->hl.hl] + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (state->memory[state->hl.hl] + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void adc_a(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += state->af.s.a + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (state->af.s.a + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sub_b(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= state->bc.s.b);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= state->bc.s.b;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sub_c(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= state->bc.s.c);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= state->bc.s.c;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sub_d(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= state->de.s.d);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= state->de.s.d;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sub_e(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= state->de.s.e);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= state->de.s.e;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sub_h(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= state->hl.s.h);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= state->hl.s.h;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sub_l(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= state->hl.s.l);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= state->hl.s.l;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sub_m(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= state->memory[state->hl.hl]);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= state->memory[state->hl.hl];
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sub_a(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= state->af.s.a;
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sbb_b(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a -= state->bc.s.b + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (state->bc.s.b + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sbb_c(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a -= state->bc.s.c + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (state->bc.s.c + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sbb_d(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a -= state->de.s.d + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (state->de.s.d + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sbb_e(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a -= state->de.s.e + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (state->de.s.e + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sbb_h(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a -= state->hl.s.h + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (state->hl.s.h + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sbb_l(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a -= state->hl.s.l + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (state->hl.s.l + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sbb_m(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a -= state->memory[state->hl.hl] + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (state->memory[state->hl.hl] + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void sbb_a(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a -= state->af.s.a + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (state->af.s.a + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
 }
 
 void ana_b(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= state->bc.s.b);
 }
 
 void ana_c(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= state->bc.s.c);
 }
 
 void ana_d(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= state->de.s.d);
 }
 
 void ana_e(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= state->de.s.e);
 }
 
 void ana_h(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= state->hl.s.h);
 }
 
 void ana_l(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= state->hl.s.l);
 }
 
 void ana_m(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= state->memory[state->hl.hl]);
 }
 
 void ana_a(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= state->af.s.a);
 }
 
 void xra_b(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= state->bc.s.b);
 }
 
 void xra_c(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= state->bc.s.c);
 }
 
 void xra_d(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= state->de.s.d);
 }
 
 void xra_e(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= state->de.s.e);
 }
 
 void xra_h(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= state->hl.s.h);
 }
 
 void xra_l(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= state->hl.s.l);
 }
 
 void xra_m(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= state->memory[state->hl.hl]);
 }
 
 void xra_a(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= state->af.s.a);
 }
 
 void ora_b(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= state->bc.s.b);
 }
 
 void ora_c(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= state->bc.s.c);
 }
 
 void ora_d(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= state->de.s.d);
 }
 
 void ora_e(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= state->de.s.e);
 }
 
 void ora_h(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= state->hl.s.h);
 }
 
 void ora_l(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= state->hl.s.l);
 }
 
 void ora_m(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= state->memory[state->hl.hl]);
 }
 
 void ora_a(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= state->af.s.a);
 }
 
@@ -1096,7 +1258,10 @@ void push_b(State8080 *state, uint8_t *opcode)
 
 void adi(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a += opcode[1]);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += opcode[1];
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
     state->pc += 1;
 }
 
@@ -1149,8 +1314,10 @@ void call_addr(State8080 *state, uint8_t *opcode)
 
 void aci(State8080 *state, uint8_t *opcode)
 {
-    state->af.s.a += opcode[1] + state->af.s.cc.cy;
-    update_flags(&state->af.s.cc, state->af.s.a);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a += (opcode[1] + state->af.s.cc.cy);
+    update_ac_inc(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
     state->pc += 1;
 }
 
@@ -1208,7 +1375,10 @@ void push_d(State8080 *state, uint8_t *opcode)
 
 void sui(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= opcode[1]);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= opcode[1];
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
     state->pc += 1;
 }
 
@@ -1254,7 +1424,10 @@ void cc_addr(State8080 *state, uint8_t *opcode)
 
 void sbi(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a -= opcode[1] + state->af.s.cc.cy);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a -= (opcode[1] + state->af.s.cc.cy);
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
     state->pc += 1;
 }
 
@@ -1314,6 +1487,7 @@ void push_h(State8080 *state, uint8_t *opcode)
 
 void ani(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a &= opcode[1]);
     state->pc += 1;
 }
@@ -1366,6 +1540,7 @@ void cpe_addr(State8080 *state, uint8_t *opcode)
 
 void xri(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a ^= opcode[1]);
     state->pc += 1;
 }
@@ -1422,6 +1597,7 @@ void push_psw(State8080 *state, uint8_t *opcode)
 
 void ori(State8080 *state, uint8_t *opcode)
 {
+    state->af.s.cc.ac = 0;
     update_flags(&state->af.s.cc, state->af.s.a |= opcode[1]);
     state->pc += 1;
 }
@@ -1472,7 +1648,10 @@ void cm_addr(State8080 *state, uint8_t *opcode)
 
 void cpi(State8080 *state, uint8_t *opcode)
 {
-    update_flags(&state->af.s.cc, state->af.s.a - opcode[1]);
+    uint16_t prevv = state->af.s.a;
+    uint16_t newv = state->af.s.a - opcode[1];
+    update_ac_dec(&state->af.s.cc, prevv, newv);
+    update_flags(&state->af.s.cc, newv);
     state->pc += 1;
 }
 
@@ -1833,6 +2012,10 @@ int main(int argc, char *argv[])
     state->memory[22] = 0x76;
 
     emulate8080(state);
+
+    state->bc.s.b = 16;
+    dcr_b(state, NULL);
+
 
     print_regs(state);
 
